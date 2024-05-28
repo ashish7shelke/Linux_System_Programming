@@ -1,0 +1,134 @@
+********************************************************
+			Static Libraries
+********************************************************
+
+Extension of static library is (*.a)
+
+Libraries are typically named with prefix "lib"
+While linking, command line refrence to the library will not contain the library prefix or suffix
+	e.g. gcc src.c -lm -lpthread --> l is automatically converted to lib
+
+ldd ./executable --> This command enlists all linked dynamic libraries to the executable
+
+Static Linking:
+--------------------------------------------------------
+
+It copies all library modules (not all modules in library) used in program into final executable file.
+
+This is done at linking stage.
+
+Linker combines all library routines with program code in order to resolve external refrences, and generate an executable image suitable for loading into memory.
+
+Advantages:
+--------------------------------------------------------
+It makes process faster compared to shared library because all object files are available in executable file.
+
+Once executable is created, developer no need to worry whether client has required library at runtime.
+
+Disadvanteges:
+--------------------------------------------------------
+Executable size is larger.
+
+If any changes to be made in static library, It has to recompiled and re linked to the program/application.
+
+When to use static library:
+--------------------------------------------------------
+When we are not sure which version of library will be available in running system.
+
+Create static library
+--------------------------------------------------------
+While creating static library, set of object files were copied into a single file with suffix .a.
+
+Archiver (ar) is tool used to create static library.
+
+ar program can be used to:
+	Create static libraries
+	Modify object files from the source files of project
+	List the names of object files in the library
+	
+Steps to create library:
+	Create object files from the source fiels of the project
+	Create static library from the object files
+	
+Create object files:
+	gcc -c add.c
+	gcc -c mul.c
+	gcc -c div.c
+	gcc -c sub.c
+Create statuic library:
+	ar rcs libname.a add.o mul.o div.o sub.o
+	
+	c -- Create archive if it soes not exists
+	r -- Replace the older object files in folder with newer object files
+	s -- Write object files index into the archive (This index is used by the compiler to speed up symbol look-up inside the library)
+
+Linking static library into application:
+	gcc main.c -o main -lname -L.
+	
+	-L -- indicates directory of libraries (non standard libraries) 
+	-lname -- -l indicates name of library, lname will converted to libname.a by the compiler
+
+
+$ gcc -c add.c sub.c mul.c div.c  --> Creating object files from source files
+$ ar rcs libarith.a add.o sub.o mul.o div.o --> Creating executable file from object files
+
+$ gcc  main.c -larith -L../ --> providong library to the compiler (linker)
+
+How to check content of static library:
+------------------------------------------------------
+ar -t libname.a --> Display number of object files in the library
+	$ ar -t libarith.a 
+	add.o
+	sub.o
+	mul.o
+	div.o
+
+
+nm -C libname.a --> Display the symbols in the library
+	$ nm -C  libarith.a 
+
+	add.o:
+	0000000000000000 T add
+
+	sub.o:
+	0000000000000000 T sub
+
+	mul.o:
+	0000000000000000 T mul
+
+	div.o:
+	0000000000000000 T div
+
+
+nm --> This program gives following information:
+	Virtual addresses of the symbol
+	A character in the output depicts the symbol type
+		If character is in lower case then symbol is local, if character is in upper case then symbol is external
+		U: undefined symbol
+		T: Global text symbol
+		t: Local text symbol
+		D: Global data symbol
+		d: Local data symbol
+		B: Global bss symbol
+		b: Local bss symbol
+	Name of the symbol
+
+$ nm libarith.a 
+
+add.o:
+0000000000000000 T add
+
+sub.o:
+0000000000000000 T sub
+
+mul.o:
+0000000000000000 T mul
+
+div.o:
+0000000000000000 T div
+
+
+ar -X libname.a --> Extracts object files of the static library
+
+
+ 	 
