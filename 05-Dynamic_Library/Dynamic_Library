@@ -1,0 +1,125 @@
+********************************************************
+			Dynamic Libraries
+********************************************************
+
+Loader:
+	Compiler output is assembly file.
+	Assembly output is object file.
+	Linker joins object files into executable file.
+	
+	Loader brings this file on memory and starts execution.
+	
+Dynamic Linking (*.so):
+	While static linking, linker finds the bits that the program module needs and physically copies them into executable output file that it generates.
+	While dynamic linking, it doesn't copy instead it leaves note in executable saying when this program is runs, it will first have to load this library.
+	Dynamic linking can occur when executable is first loaded and run (load-time linking).
+	Dynamic linking can occur after program has begun (run-time linking)
+	
+
+Advantage:
+	Dynamic libraries provide a means to use code that can be loaded anywhere in the memory.
+	Once loaded, library code can be used by any number of programs.
+	By this way actual executable size is kept very low.
+	Library code is kept in shared memory as common code.
+	
+There are wyas to link library
+1) Load-Time
+2) Run-time
+
+Steps to create LoadTime shared library:
+--------------------------------------------------------
+1) Create object files
+	$ gcc -fPIC -c *.c
+	
+	fPIC --> This flag stands for Position Independent Code, This is a characteristic required by shared library
+	
+2) Create library
+	
+	$ gcc -shared -Wl,-soname,libarith.so -o libarith.so *.o
+	
+		-shared key tells the compiler to produce a shared object which can be linked with other objects to form an executable
+		-Wl flag passes an option to linker with format -wl,options
+			in case of our example it sets the name of library, as it will be passed to linker	
+
+Use the dynamic library
+=============================
+$ cd app
+$ gcc main.c -o main -I.. -larith -L..
+
+$ export LD_LIBRARY_PATH = ..
+$ unset LD_LIBRARY_PATH
+
+$ gcc -o main main.c -larith -L.. -Wl,-rpath=..
+
+While laoding, library laoded first then main program loaded
+
+Tools to work with dynamic library
+===================================
+
+To find out what functions a library has, use the nm command
+
+$ nm libarith.so
+
+Steps to create RunTime shared library:
+-------------------------------------------------------
+
+
+--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------
+Linux shared library can have three names. Which are:
+
+	Linker name (eg: libexample.so)
+	Soname (eg : libexample.so.1.2)
+	Real Name (eg : libexample.so.1.2.3)
+
+
+Linker Name
+==============
+
+Linker Name is the name that is requested by the linker when another code is linked with your library (with –lexample linker option). 
+
+Linker name typically starts with
+	the prefix lib
+	name of the library
+	the phrase .so
+
+soname
+=============
+
+Every shared library has a special name called the ``soname''.
+
+The soname has 
+	the prefix ``lib'', 
+	the name of the library, 
+	the phrase ``.so'', 
+	followed by a period 
+	and a version number that is incremented whenever the interface changes 
+
+Eg. libarith.so.1
+
+Real Name
+=============
+
+Real Name is the actual name of the shared library file. 
+
+Real Name = soname + minor version number
+
+Eg. libarith.so.1.0
+
+It can also be libarith.so.1.0.1.3
+
+During shared library installation
+=====================================
+
+soname is a symbolic link to the real name
+
+linker name is a symbolic link to the soname
+
+In this way both soname and linker names ultimately point to the real name of the library (i.e. actual library file).
+
+Command to read the soname
+============================
+$ readelf -d libarith.so
+
+
+
